@@ -1,0 +1,14 @@
+! Trying to default xterm to its "Large" font preset
+!xterm*reverseVideo: on
+xterm*cursorBlink: on
+xterm*cursorOffTime: 750
+xterm*cursorOnTime: 750
+xterm*font: *-fixed-medium-*-*-*-18-*
+xterm*font2: *-clean-medium-r-*-*-17-*
+xterm*geometry: 102x44
+xterm*VT100.translations: #override \n\
+	Shift <KeyPress> Select:select-cursor-start() select-cursor-end(PRIMARY, CLIPBOARD, CUT_BUFFER0) \n\
+	Shift <KeyPress> Insert:insert-selection(PRIMARY, CLIPBOARD, CUT_BUFFER0) \n\
+	~Ctrl ~Meta <Btn2Up>:insert-selection(PRIMARY, CLIPBOARD, CUT_BUFFER0) \n\
+	<BtnUp>:select-end(PRIMARY, CLIPBOARD, CUT_BUFFER0) \n\
+

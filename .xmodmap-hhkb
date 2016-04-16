@@ -1,0 +1,24 @@
+! The cool (non-chorded) parts of the Happy Hacking Keyboard Pro layout.
+
+! Commented: This is done natively in my Topre and fine-tuned in my setxkbmap.
+!! Swap Caps_Lock and Control_L
+!remove Lock = Caps_Lock
+!remove Control = Control_L
+!keysym Control_L = Caps_Lock
+!keysym Caps_Lock = Control_L
+!add Lock = Caps_Lock
+!add Control = Control_L
+
+! Swap Escape and Backtick/Tilde
+!keycode 49 = Escape NoSymbol Escape
+!keycode  9 = grave asciitilde numbersign bar backslash
+keycode 49 = Escape Escape Escape Escape
+keycode  9 = grave asciitilde numbersign bar
+
+! Commented: This requires to modify /usr/share/X11/xkb/symbols/pc to change
+! the type of key <BKSP> from "CTRL+ALT" to "TWO_LEVEL".
+!! Swap Backspace and Backslash/Pipe
+!keycode 51 = BackSpace
+!keycode 22 = backslash bar
+keycode 38 = a A a A
+keycode 26 = e E e E

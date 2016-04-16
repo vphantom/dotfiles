@@ -1,0 +1,69 @@
+# Had these for Maildir, implementing now for IMAP.
+macro index c "<change-folder>?" "open a different folder"
+macro pager c "<change-folder>?" "open a different folder"
+macro index C "<copy-message>?" "copy a message to a mailbox"
+macro index M "<save-message>?" "move a message to a mailbox"
+macro pager M "<save-message>?" "move a message to a mailbox"
+macro index A "<attach-message>?" "attach message(s) to this message"
+
+# Skipping personal service/encryption stuff...
+
+set xterm_set_titles=yes
+set xterm_title="%u/%F/%M - Mutt"
+set certificate_file="~/.mutt/certificates"
+set alias_file="~/.mutt/aliases"
+source "~/.mutt/aliases"
+set read_inc=100
+set write_inc=100
+set net_inc=100
+unset confirmappend
+set delete=yes
+set auto_tag
+set pager_stop
+unset mark_old
+unset move
+set fast_reply
+set include
+unset write_bcc
+unset metoo
+unset reply_self
+set include
+set sort='threads'
+set sort_aux='last-date-received'
+folder-hook . 'push <collapse-all>'
+macro index i "<limit>~( ~F | ~N | ~O )<enter><collapse-all><next-new-then-unread>" "LIMIT: Flagged/new messages"
+macro index I "<limit>all<enter><collapse-all><next-new-then-unread>" "LIMIT: Show all messages"
+
+# Help removing attachments from mailboxes
+macro index [ "<limit>~X 1- ~z 20000-<enter>" "LIMIT: attachments total over 20kb"
+macro attach <pagedown> "<exit><next-undeleted><view-attachments>" "Go to next unread message"
+
+set index_format="%5C %Z %?y?%-9.9y ?%[%Y-%m-%d %H:%M] %4c %-15.15L %?M?(%3M)? %s"
+set my_default_editor=$editor
+macro index . "<collapse-thread>"
+set pager_index_lines=6
+bind index <right> display-message
+bind pager <left> exit
+color index brightred default "~(~F) ~v"
+color index brightred default "~F"
+# My clients abuse Outlook's "urgent" flag, disabling it.
+#color index brightred default '~h "importance:.*high|priority.*urgent"'
+#set edit_headers
+# Save sent messages in current folder, NOT /Sent, improves thread usefulness.
+folder-hook . 'set record="^"'
+set mime_forward=ask-yes
+set send_charset="us-ascii:iso-8859-1:utf-8"
+# Help play nice with origins without decent charsets.
+set assumed_charset="windows-1252:iso-8859-1:utf-8:us-ascii"
+# Further help against Outlook hell
+# It lies claiming iso-8859-1 for example, while really meaning windows-1252!
+charset-hook ^us-ascii$   windows-1252
+charset-hook ^iso-8859-1$ windows-1252
+ignore *
+unignore from: reply-to: subject to: cc: mail-followup-to: sender: date: organization organisation resent x-rt-metadata x-rt-requestors x-rt-admincc x-rt-url
+set sendmail_wait=-1
+set sleep_time=0
+auto_view text/html
+alternative_order text/plain text/html
+bind attach i exit
+bind index t tag-subthread

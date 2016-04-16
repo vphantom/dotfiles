@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# My personalized X keyboard setup
+
+# Defining a class in xorg.conf worked, but after consideration, I prefer
+# having my configuration in $HOME.
+# Noteworthy: I still cleaned up Debian's /etc/default/keyboard|console-setup
+# -layout "us,ca,ru(phonetic)"
+setxkbmap -rules xorg -keycodes "evdev+aliases(qwerty)" -model pc104 -layout "us,ca" -option "grp:shift_toggle,grp_led:scroll,ctrl:nocaps,compose:lwin"
+# Further tend towards HHKB layout
+xmodmap ~/.xmodmap-hhkb

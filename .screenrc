@@ -1,0 +1,11 @@
+vbell off
+startup_message off
+defscrollback 1000
+bind ^\
+bind ^a copy
+#backtick 1 5 5 /home/lis/.screen-mail
+#backtick 2 10 10 /home/lis/.screen-dvgrab
+#hardstatus alwayslastline "%{= R} %c %{= bc} %-w%{+ cb}%n %t%{-}%+w %-=%1`%2`"
+hardstatus alwayslastline "%{= R} %c %{= bc} %-w%{+ cb}%n %t%{-}%+w"
+msgwait 1
+defflow off

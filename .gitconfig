@@ -1,0 +1,9 @@
+[user]
+	name = Stéphane Lavergne
+	email = lis@imars.com
+[color]
+	ui = auto
+[credential]
+	helper = cache
+[push]
+	default = simple
