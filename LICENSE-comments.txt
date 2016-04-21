@@ -1,0 +1,9 @@
+/*! Name v0.0.0-alpha
+ * <https://github.com/vphantom/name>
+ * Copyright 2016 Stéphane Lavergne
+ * Free software under Affero GPL 3.0: <http://www.gnu.org/licenses/agpl-3.0.txt> */
+
+/*! Name v0.0.0-alpha
+ * <https://github.com/vphantom/name>
+ * Copyright 2016 Stéphane Lavergne
+ * Free software under MIT License: <https://opensource.org/licenses/MIT> */
