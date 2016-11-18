@@ -2,6 +2,7 @@
 " See: http://www.vim.org/scripts/script.php?script_id=441
 " I use it with the following in my .vimrc:
 " let g:localvimrc_persistent=2
+" let g:localvimrc_event=["BufWinEnter","BufReadPre","BufNewFile"]
 if &filetype =~ 'php'
    setlocal expandtab
    setlocal tabstop=4
