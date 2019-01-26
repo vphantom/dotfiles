@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ ".$1." = ".." ]; then
+	echo "Usage: $0 imagefile"
+	exit 1
+fi
+
+# Sampling factors:
+# 4:2:0 (vertical and horizontal)
+# 4:2:2 (horizontal only)
+# 4:4:4 (no subsampling)
+convert "$1" -compress JPEG -quality 85 -sampling-factor 4:4:4 -interlace JPEG -define jpeg:dct-method=float,jpeg:optimize-coding=on "$1.jpg"
+jpegtran -optimize -progressive -copy all -restart 1 -outfile "$1-optimized.jpg" "$1.jpg"
+

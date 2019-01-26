@@ -1,0 +1,2 @@
+#!/bin/sh
+gs -o "$1.noimage.pdf" -sDEVICE=pdfwrite  -dFILTERIMAGE "$1"

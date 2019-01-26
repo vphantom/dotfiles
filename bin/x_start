@@ -1,0 +1,28 @@
+#!/bin/sh
+
+echo ">>>   lis X start"
+
+# Allow my other computer to open windows here.
+#xhost +lis
+
+# Help xdg-open along...
+#export DESKTOP_SESSION=gnome
+
+# I'm not using XFWM, do I need to tell OpenBox this?
+#xrandr --dpi 133 &
+
+~/bin/keyboard
+~/bin/mouse
+#~/bin/filesync
+
+# Change screen gamma based on time of day
+# Location hard-coded to Sherbrooke, QC, Canada
+# Apparent memory leak in gtk-redshift, so trying headless version.
+# Commenting in favor of manual aliases "nightshift" and "dayshift"
+#redshift -l 45.41770:-71.92608 -b 1.0:0.67 -t 6500:3700 &
+
+# I need to override a mouse pointer
+mkfontdir /home/lis/.fonts
+xset +fp /home/lis/.fonts
+xset fp rehash
+

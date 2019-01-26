@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use CDDB_get qw( get_cddb );
+
+my %config;
+
+$config{input}=1;
+
+my %cd = get_cddb(\%config);
+
+die "No CDDB entry found/selected." unless (defined $cd{title});
+
+# Do the classical ones come from CDDB as well?
+# composer
+# conductor
+# performer
+# ensemble
+#
+# Others:
+# label
+# labelno
+# location
+
+# Currently nused information
+# print "extended genre: $cd{genre}\n";  # i.e. "Jazz/Big Bands" vs cat=='jazz'
+# print "number of tracks: $cd{tno}\n";
+
+# WARNING: Does not compare number of tracks (or lengths) with CDDB data!
+my $i=1;
+foreach my $n ( @{$cd{track}} ) {
+	my $ii = $i;
+	if ($i < 10) { $ii = "0$i"; };  # Cheap hack, I know...
+	my $src = "track$ii.cdda.wav";
+	if (-e $src ) {
+		my $safeTitle  = $n;
+		my $safeArtist = $cd{artist};
+		my $safeAlbum  = $cd{title};
+		$safeTitle  =~ tr/A-Za-z0-9 .,_-//cd;
+		$safeArtist =~ tr/A-Za-z0-9 .,_-//cd;
+		$safeAlbum  =~ tr/A-Za-z0-9 .,_-//cd;
+		mkdir $safeArtist;
+		mkdir "$safeArtist/$safeAlbum";
+		my $fbasename = "$safeArtist/$safeAlbum/$ii - $safeTitle";
+		rename $src, "$fbasename.wav";
+		my $tags =
+			  "title=$n\n"
+			. "tracknumber=$ii\n"
+			. "artist=$cd{artist}\n"
+			. "album=$cd{title}\n"
+			. "date=$cd{year}\n"
+			. "genre=$cd{cat}\n"
+			. "sourcemedia=CD\ndiscid=$cd{id}\n"
+		;
+		print "Saving tags for: $fbasename\n";
+		open TAGFILE, ">$fbasename.flac.tags" or die "Cannot open $fbasename.flac.tags for writing: $!\n";
+		print TAGFILE $tags;
+		close TAGFILE;
+	} else {
+		print "Warning: '$src' not found, skipped.\n";
+	};
+	$i++;
+};
+

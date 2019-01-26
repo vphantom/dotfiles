@@ -1,0 +1,2 @@
+#!/bin/sh
+exec xterm -e "xsel |gpg 2>&1 |less"

@@ -1,0 +1,50 @@
+#!/bin/sh
+
+echo ">>>   lis mouse"
+
+# My personalized X mouse setup
+
+# Mouse acceleration
+#xset m 1 10
+# http://xorg.freedesktop.org/wiki/Development/Documentation/PointerAcceleration
+#
+## HP Wireless Optical Mobile Mouse
+##
+## This gives a smooth ramp-up of acceleration at a scale suitable for my
+## 1250cpi mouse.  Tried creating a class in xorg.conf but it was ignored, even
+## though a similar keyboard class was useful.
+#xinput set-prop "HP Wireless Optical Mobile Mouse" "Device Accel Profile" 2
+#xinput set-prop "HP Wireless Optical Mobile Mouse" "Device Accel Constant Deceleration" 4
+#xinput set-prop "HP Wireless Optical Mobile Mouse" "Device Accel Adaptive Deceleration" 1
+#
+
+
+# ImPS/2 Generic Wheel Mouse
+#
+# This is my hard-wired PS/2 HP mouse.
+#
+xinput set-prop "ImPS/2 Generic Wheel Mouse" "Device Accel Profile" 2
+xinput set-prop "ImPS/2 Generic Wheel Mouse" "Device Accel Constant Deceleration" 2
+xinput set-prop "ImPS/2 Generic Wheel Mouse" "Device Accel Adaptive Deceleration" 1
+
+# Logitech G300s Gaming Mouse
+#
+# On Titan, these are the properties we need.
+xinput set-prop "pointer:Logitech G300s Optical Gaming Mouse" "Device Accel Profile" 2
+xinput set-prop "pointer:Logitech G300s Optical Gaming Mouse" "Device Accel Constant Deceleration" 1
+xinput set-prop "pointer:Logitech G300s Optical Gaming Mouse" "Device Accel Adaptive Deceleration" 1
+# On Titanium, we're stuck with libinput and higher DPI, so:
+xinput set-prop "pointer:Logitech G300s Optical Gaming Mouse" "libinput Accel Speed" 0
+
+# Synaptics touchpad and trackpoint
+#
+# We NEED palm detection!
+# Unfortunately, a probable kernel bug makes them report as 0-wide, useless without patching. :-(
+# https://bugzilla.kernel.org/show_bug.cgi?id=77161 since 2014, quiet since 2015, nobody cares.
+xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Palm Detection" 0
+xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Palm Dimensions" 100 200
+# Set decent scrolling pace to TRY to match Chromebook or 1:1 with feel
+xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Scrolling Distance" -264 -264
+# Try to minimize that half-second delay (unsuccessfully)
+xinput set-prop "SynPS/2 Synaptics TouchPad" "Synaptics Noise Cancellation" 0 0
+

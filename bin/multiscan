@@ -1,0 +1,352 @@
+#!/bin/bash
+#
+# MODIFICATIONS IN PROGRESS, STILL UNTESTED!
+#
+# TODO:
+#
+# * BIG OVERHAUL: Ask for ADF mode, if yes process the whole batch somehow, no length
+#
+
+## CONFIGURATION
+
+# Where to store current counter
+#
+COUNTER_FILENAME="./.scan-counter"
+
+## END OF CONFIGURATION
+
+
+## LIBRARY OF COMPONENTS
+
+# Defaults which change if select_sane() knows the scanner involved
+IS_FLATBED=1
+CAN_DUPLEX=0
+CAN_ADF=0
+
+# Defaults used for skipping selectively.
+DEFAULT_WIDTH=216
+
+# Select among currently available SANE devices.
+#
+# Defines global variables:
+#
+# $SANE_DEVICE     Selected device suitable for "scanimage --device"
+# $SANE_DEVICES[]  All devices found by scanimage
+# $SANE_NAMES[]    Names of all devices found by scanimage
+# $SANE_DRIVER     Name of SANE driver selected (used by scan() to tweak args)
+select_sane() {
+	echo "***   Searching for SANE devices..."
+	eval `scanimage -f 'SANE_DEVICES[%i]="%d"%nSANE_NAMES[%i]="%v %m %t"%n'`
+
+	echo "***   Please select which device to use:"
+	for i in ${!SANE_DEVICES[*]}; do
+		echo "      ${i}. ${SANE_NAMES[$i]}"
+	done
+	read -N 1 -p "[${!SANE_DEVICES[*]}] " DEVCHOICE
+	echo
+	SANE_DEVICE="${SANE_DEVICES[$DEVCHOICE]}"
+	if [ -z "$SANE_DEVICE" ]; then
+		echo "***   ERROR: No device '$DEVCHOICE'."
+		exit 1
+	fi
+	echo "Selected: ${SANE_NAMES[$DEVCHOICE]}"
+	SANE_DRIVER=${SANE_DEVICE/:*/}
+	case $SANE_DRIVER in
+		plustek)
+			echo "Features: FLATBED"
+			IS_FLATBED=1
+			CAN_DUPLEX=0
+			CAN_ADF=0
+		;;
+		epson)
+			echo "Features: FLATBED"
+			IS_FLATBED=1
+			CAN_DUPLEX=0
+			CAN_ADF=0
+		;;
+		fujitsu)
+			echo "Features: DUPLEX ADF"
+			IS_FLATBED=0
+			CAN_DUPLEX=1
+			CAN_ADF=1
+		;;
+		*)
+			echo "Using generic flatbed settings..."
+		;;
+	esac
+	echo
+}
+
+# Perform scan
+#
+# Depends on global variables:
+#
+# $SANE_DRIVER   Used to tweak args a bit
+# $MODE          Color|Gray
+# $DPI           50, 75, 150, 300, 600, etc.
+# $WIDTH         Width in mm, i.e. 216 for letter format
+# $LENGTH        Travel in mm, i.e. 279 for letter format
+# $NEXT_I        Image serial number
+# $DO_DUPLEX     Request both sides
+# $DO_ADF        Batch until ADF is empty
+#
+# The following notes apply to single-page scanning only, not ADF:
+#
+# Because scanimage only returns after the scanner completely returned its
+# lens to the home position, I'm running it in the background and waiting to
+# receive the output file.  I used to do this with "expect" but it is more
+# reliable to wait for the file itself instead.
+#
+# But now, we post-process the image while scanimage is still running, so
+# there's a chance the user might request the next scan before the head is
+# fully home, therefore we also wait for scanimage to exit before proceeding.
+#
+# This means we can't run multiple scanners at the same time right now, which
+# suits my use case just fine.
+#
+scan() {
+	# Wait indefinitely if another scanimage is still running
+	if pgrep scanimage >/dev/null; then
+		echo "***   Waiting for current scan to finish..."
+		while pgrep scanimage >/dev/null; do sleep 0.2; done
+	fi
+
+	echo "***   Scanning ${WIDTH}x${LENGTH}mm in $MODE at ${DPI}dpi..."
+	DEVICE_SPECIFIC=""
+	case $SANE_DRIVER in
+		plustek)
+			DEVICE_SPECIFIC="--calibration-cache=yes -l 0 -t 0 -x $WIDTH -y $LENGTH"
+		;;
+		fujitsu)
+			# For some reason "--df-diff=10mm is rejected as "inactive" ?
+			DEVICE_SPECIFIC="--ald=yes --df-action=Stop --df-skew=yes --df-thickness=yes --df-length=yes -y 876 --page-height 876 --brightness 25"
+			if [ $DO_DUPLEX = "1" ]; then
+				DEVICE_SPECIFIC="${DEVICE_SPECIFIC} --source 'ADF Duplex'"
+			else
+				DEVICE_SPECIFIC="${DEVICE_SPECIFIC} --source 'ADF Front'"
+			fi
+			if [ $WIDTH != $DEFAULT_WIDTH ]; then
+				DEVICE_SPECIFIC="${DEVICE_SPECIFIC} --page-width $WIDTH"
+			fi
+		;;
+		epson)
+			DEVICE_SPECIFIC=""
+		;;
+		*)
+			DEVICE_SPECIFIC=""
+		;;
+	esac
+
+	# Using eval because DEVICE_SPECIFIC may contain quoted arguments to preserve.
+	if [ $DO_ADF = "1" ]; then
+		echo "scanimage -p --device '${SANE_DEVICE}' ${DEVICE_SPECIFIC} --format=tiff --mode $MODE --resolution $DPI --batch=./scan-%04d.tiff --batch-start=$NEXT_I"
+		eval "scanimage -p --device '${SANE_DEVICE}' ${DEVICE_SPECIFIC} --format=tiff --mode $MODE --resolution $DPI --batch=./scan-%04d.tiff --batch-start=$NEXT_I"
+	else
+		echo "scanimage -p --device '${SANE_DEVICE}' ${DEVICE_SPECIFIC} --format=tiff --mode $MODE --resolution $DPI --batch=./scan-%04d.tiff --batch-start=$NEXT_I --batch-count=1" &
+		eval "scanimage -p --device '${SANE_DEVICE}' ${DEVICE_SPECIFIC} --format=tiff --mode $MODE --resolution $DPI --batch=./scan-%04d.tiff --batch-start=$NEXT_I --batch-count=1" &
+		# Wait indefinitely for the output file to be ready before returning
+		while [ ! -s ./scan-$NEXT_I.tiff ]; do sleep 0.2; done
+	fi
+}
+
+# Ask whether to scan both sides of the page
+#
+# Defines global variable:
+#
+# $DO_DUPLEX  Where "1" means true.
+#
+DO_DUPLEX=0
+select_duplex() {
+	if [ $CAN_DUPLEX = "1" ]; then
+		read -N 1 -p "***   Scan both sides? [YN] " SIDES
+		echo
+		case $SIDES in
+			y|Y)  DO_DUPLEX=1 ;;
+			*)    DO_DUPLEX=0 ;;
+		esac
+	else
+		DO_DUPLEX=0
+	fi
+}
+
+# Ask whether to scan a single page or until ADF empty
+#
+# Defines global variable:
+#
+# $DO_ADF  Where "1" means true.
+#
+DO_ADF=0
+select_adf() {
+	if [ $CAN_ADF = "1" ]; then
+		read -N 1 -p "***   Use entire auto document feeder? [YN] " ADF
+		echo
+		case $ADF in
+			y|Y)  DO_ADF=1 ;;
+			*)    DO_ADF=0 ;;
+		esac
+	else
+		DO_ADF=0
+	fi
+}
+
+# Ask which format presets to use.
+#
+# CAUTION: Assumes it's being invoked inside a loop!
+#
+# Defines global variable:
+#
+# $FORMAT  The one-letter keystroke entered.
+select_format() {
+	read -N 1 -p "***   Format of next page #$NEXT_I: [CcGg] [?=Help] [Q=Quit] " FORMAT
+	echo
+	case $FORMAT in
+		q|Q)
+			break
+		;;
+		\?)
+			echo
+			echo "***   Available formats:"
+			echo "      C  600 dpi, Color"
+			echo "      c  300 dpi, Color"
+			echo "      G  600 dpi, Gray"
+			echo "      g  300 dpi, Gray"
+			echo
+			continue
+		;;
+	esac
+}
+
+# If flatbed, ask for page length, else assume Letter
+#
+# Defines global variables:
+#
+# $LENGTH  Page length in mm
+select_height() {
+	if [ $IS_FLATBED = "1" ]; then
+		read -N 1 -p "***   Height: [123456789LM] " FORMAT_LENGTH
+		echo
+		case $FORMAT_LENGTH in
+			1)   LENGTH="26" ;;
+			2)   LENGTH="51" ;;
+			3)   LENGTH="77" ;;
+			4)   LENGTH="102" ;;
+			5)   LENGTH="127" ;;
+			6)   LENGTH="153" ;;
+			7)   LENGTH="178" ;;
+			8)   LENGTH="204" ;;
+			9)   LENGTH="229" ;;
+			l|L) LENGTH="279" ;;
+			m|M) LENGTH="297" ;;
+			# Device reports 297 as its maximum.
+			*)
+				echo "***   ERROR: Unknown height code '${FORMAT_HEIGHT}'."
+				continue
+			;;
+		esac
+	else
+		LENGTH="279"
+	fi
+}
+
+# If feeder, speed can be gained by restricting width.
+#
+# Defines global variables:
+#
+# $WIDTH  Maximum width in mm
+select_width() {
+	if [ $CAN_ADF = "1" ]; then
+		read -N 1 -p "***   Width: [12345678M] " FORMAT_WIDTH
+		echo
+		case $FORMAT_WIDTH in
+			1)   WIDTH="26" ;;
+			2)   WIDTH="51" ;;
+			3)   WIDTH="77" ;;
+			4)   WIDTH="102" ;;
+			5)   WIDTH="127" ;;
+			6)   WIDTH="153" ;;
+			7)   WIDTH="178" ;;
+			8)   WIDTH="204" ;;
+			l|L|m|M) WIDTH="${DEFAULT_WIDTH}" ;;
+			*)
+				echo "***   ERROR: Unknown width code '${FORMAT_WIDTH}'."
+				continue
+			;;
+		esac
+	else
+		# Flatbeds tend not to accelerate when scanning narrower areas anyway.
+		WIDTH="${DEFAULT_WIDTH}"
+	fi
+}
+
+# Find next suitable serial number
+find_next_i() {
+	if [ -e "${COUNTER_FILENAME}" ]; then
+		LASTDONE=`cat "${COUNTER_FILENAME}"`
+	else
+		LASTDONE=0
+	fi
+	# Tricky: possible leading zeros, not octal, specify base 10 explicitly.
+	NEXT_I=$(( 10#$LASTDONE + 1 ))
+	for i in $(seq --format=%04.f $NEXT_I 9999); do
+		if [ -e scan-$i.tiff  -o  -e scan-$i.jpg  -o  -e scan-$i.png ]; then
+			echo $i >"${COUNTER_FILENAME}"
+		else
+			NEXT_I=$i
+			break
+		fi
+	done
+}
+
+# Make sure dependencies are met
+check_deps() {
+	DEPS="scanimage pgrep"
+	ERRORS=0
+	for prog in $DEPS; do
+		if [ -z "`which $prog`" ]; then
+			ERRORS=1
+			echo "${0}: Please install '$prog' before using this program."
+		fi
+	done
+	if [ $ERRORS -gt 0 ]; then
+		exit 1
+	fi
+}
+
+
+## MAIN PROGRAM BEGINS HERE
+
+check_deps
+echo
+select_sane
+while true; do
+	find_next_i
+	select_format
+	select_width
+	select_height
+	select_duplex
+	select_adf
+
+	case $FORMAT in
+		C)
+			MODE="Color"
+			DPI="600"
+			scan
+		;;
+		c)
+			MODE="Color"
+			DPI="300"
+			scan
+		;;
+		G)
+			MODE="Gray"
+			DPI="600"
+			scan
+		;;
+		g)
+			MODE="Gray"
+			DPI="300"
+			scan
+		;;
+	esac
+done
+exit 0

@@ -1,0 +1,66 @@
+#!/bin/sh
+# Record from an ATSC source via HDHomeRun
+
+
+## Configuration
+
+# Where should captures be stored?
+# (Log will also be stored there as _hdrecord.log.)
+STORAGE="/video/tmp"
+
+# TV Stations
+# Format: "channel program"
+declare -A STATIONS
+STATIONS[SRC]="9 3"
+STATIONS[TQ]="24 3"
+STATIONS[TVA]="7 1"
+
+# Which HDHomeRun tuner to use?
+HDHOMERUN_ID="1033FBCF"
+TUNER_ID="0"
+
+
+## Execution
+
+NOW=`date +%Y-%m-%d-%H%M`
+STATION="${1:-UNKNOWN}"
+CHANNEL="${STATIONS[$STATION]% *}"
+PROGRAM="${STATIONS[$STATION]#* }"
+DURATION="${2:-00:01:00}"
+SECONDS="$(( (10#${DURATION:0:2} * 3600) + (10#${DURATION:3:2} * 60) + 10#${DURATION:6:2} ))"
+BASENAME="${3:-capture}"
+FILE="${STORAGE}/${BASENAME}_${NOW}.ts"
+
+if [ ".${CHANNEL}." = ".."  -o  ".${PROGRAM}." = ".." ]; then
+	cat <<__SLEOF__
+
+Record from an ATSC source via HDHomeRun.
+
+Usage: ${0} station HH:MM:SS [basename]
+
+Current args record: ${STATION} (channel ${CHANNEL}, program ${PROGRAM})
+              ...to: ${FILE}
+          ...during: ${DURATION} (${SECONDS} seconds)
+
+Known stations:
+__SLEOF__
+	for K in ${!STATIONS[@]}; do
+		echo "	${K}	channel ${STATIONS[$K]% *}, program ${STATIONS[$K]#* }"
+	done
+	exit 1
+fi
+
+# Record
+# SECONDS FILE
+
+echo >>${STORAGE}/_hdrecord.log
+echo "`date`  HDHomeRun ${HDHOMERUN_ID} /tuner${TUNER_ID} channel ${CHANNEL} program ${PROGRAM} for ${SECONDS} seconds:" >>${STORAGE}/_hdrecord.log
+hdhomerun_config ${HDHOMERUN_ID} set /tuner${TUNER_ID}/channel none
+hdhomerun_config ${HDHOMERUN_ID} set /tuner${TUNER_ID}/channel auto:${CHANNEL}
+hdhomerun_config ${HDHOMERUN_ID} set /tuner${TUNER_ID}/program ${PROGRAM}
+hdhomerun_config ${HDHOMERUN_ID} save /tuner${TUNER_ID} "${FILE}" >>${STORAGE}/_hdrecord.log 2>&1 &
+sleep ${SECONDS}
+kill $!
+echo >>${STORAGE}/_hdrecord.log
+
+exit 0

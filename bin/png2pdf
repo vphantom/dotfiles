@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "Converting q*.png to 256-color 96 DPI single PDF..."
+convert q*.png -colors 256 -density 96 q.pdf

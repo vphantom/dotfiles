@@ -1,11 +1,18 @@
 #!/bin/sh
 
+echo ">>>   lis keyboard"
+
 # My personalized X keyboard setup
+
+# Start ibus daemon to regain CTRL-SHIFT-U <unicode> ENTER
+ibus-daemon -d
 
 # Defining a class in xorg.conf worked, but after consideration, I prefer
 # having my configuration in $HOME.
-# Noteworthy: I still cleaned up Debian's /etc/default/keyboard|console-setup
-# -layout "us,ca,ru(phonetic)"
-setxkbmap -rules xorg -keycodes "evdev+aliases(qwerty)" -model pc104 -layout "us,ca" -option "grp:shift_toggle,grp_led:scroll,ctrl:nocaps,compose:lwin"
-# Further tend towards HHKB layout
-xmodmap ~/.xmodmap-hhkb
+#
+# SHIFT+SHIFT  toggles language (scroll lock LED)
+# LEFT_WINDOWS is Compose
+# DISABLED: letting XFCE handle the keyboard instead of X on Titanium to avoid conflicts.
+#setxkbmap -rules xorg -keycodes "evdev+aliases(qwerty)" -model pc104 -layout "us,ca" -option "grp:shifts_toggle,grp_led:scroll,compose:lwin"
+## Further tend towards HHKB layout
+#xmodmap ~/.xmodmap-hhkb

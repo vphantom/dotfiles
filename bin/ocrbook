@@ -1,0 +1,64 @@
+#!/bin/sh
+#
+
+TESSLANG="eng"
+
+if [ ".$1." != ".." ]; then
+	TESSLANG="$1"
+else
+	echo "Usage: ${0} eng|fra"
+	exit 1
+fi
+
+echo "***   OCR for PDF and TXT outputs (language: '$TESSLANG')"
+
+# OCR
+find -path './scan-*.tif' -printf "ocrbook.tesseract $TESSLANG %p\n" |sort |parallel --progress
+
+#for I in scan-*.tif; do
+#
+#	# OCR
+#	if [ ! -e "${I:0:-4}.html" ]; then
+#		tesseract "${I}" "${I:0:-4}" -l "$TESSLANG" -psm 1 hocr ~/bin/ocrbook.tesseract.cfg
+#		# Tesseract can yield illegal character sequences.
+#		# We can use iconv -c to clean those up.
+#		iconv -f UTF-8 -t UTF-8 -c "${I:0:-4}.hocr" -o "${I:0:-4}.html"
+#		# Tesseract 3.0.3 changed from ".html" to ".hocr" which pdfbeads doesn't
+#		# know about, so we're renaming while converting.
+#		rm -f "${I:0:-4}.hocr"
+#		#mv "${I:0:-4}.html2" "${I:0:-4}.html"
+#
+#		# Invalidate dependents of this page.
+#		# (Includes deprecated hocr2pdf PDF.)
+#		rm -f "${I:0:-4}.txt" "${I:0:-4}.pdf"
+#	fi
+#
+#	# Plain text from hOCR (cleaner for Sigil than Tesseract's TXT mode.)
+#	if [ ! -e "${I:0:-4}.txt" ]; then
+#		elinks -dump 1 -dump-width 4095 "${I:0:-4}.html" >"${I:0:-4}.txt"
+#	fi
+#
+#	## Single-page poorly-compressed TIF+hOCR combo PDF
+#	## (For use with pdftk/pdfsizeopt workflow.)
+#	## Hard-coded to 600 DPI.
+#	#if [ ! -e "${I:0:-4}.pdf" ]; then
+#	#	hocr2pdf -s -r 600 -i "${I}" -o "${I:0:-4}.pdf" <"${I:0:-4}.html"
+#	#fi
+#done
+
+# Compile TXT book
+cat scan-*.txt >book.txt
+
+## Compile poorly-compressed PDF book
+#rm -f book-src.pdf
+#pdftk scan-*.pdf cat output book-src.pdf
+
+## Compile pdfsizeopt PDF book
+#rm -f book-lossless.pdf
+#pdfsizeopt book-src.pdf
+#mv book-src.psom.pdf book-lossless.pdf
+
+# Compile PDFBeads PDF book from TIFF/HTML
+rm -f book-lossy.pdf
+#pdfbeads -o book-lossy.pdf
+ocrbook.pdfbeads

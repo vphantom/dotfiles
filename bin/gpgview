@@ -1,0 +1,22 @@
+#!/bin/sh
+
+case "$1" in
+	*.txt.asc|*.txt.gpg)
+		mkfifo /tmp/gpgview.$$
+		gpg --batch -d "$1" >/tmp/gpgview.$$ &
+		xterm -e less -f /tmp/gpgview.$$
+		rm -f /tmp/gpgview.$$
+	;;
+	*.epub.gpg)
+		gpg --batch -d "$1" |epub.py -d -c "${COLUMNS:=78}" "$1" |less
+	;;
+	*.bmp.gpg|*.jpg.gpg|*.png.gpg)
+		gpg --batch -d "$1" |cat |feh --scale-down --fullscreen -
+	;;
+	*.wav.gpg|*.mpg.gpg|*.flv.gpg)
+		gpg --batch -d "$1" |vlc -
+	;;
+	*)
+		exit 1
+esac
+exit 0

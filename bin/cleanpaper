@@ -1,0 +1,244 @@
+#!/bin/bash
+
+## CONFIGURATION
+
+# Preview command
+#
+PREVIEWER="edisplay"
+
+
+## LIBRARY OF COMPONENTS
+
+# Display resulting image
+show() {
+	${PREVIEWER} $1
+}
+
+# Request approval before deleting.
+#
+# In non-interactive mode, do nothing.
+#
+# CAUTION: Expects to be run from a loop; invokes 'continue' if we're not OK
+# to delete the source image.  (So we can possibly try another format.)
+approve() {
+	if [ $IS_INTERACTIVE = "1" ]; then
+		show $1
+		read -N 1 -p "***   Result OK (delete source image)? [YN] " APPROVAL
+		echo
+		case $APPROVAL in
+			y|Y)
+				rm -f $2
+			;;
+			*)
+				rm -f $1
+				continue
+			;;
+		esac
+		echo
+	fi
+}
+
+# Identify next .PNM file
+#
+# We find each time because the contents of the directory can change during
+# our execution lifespan (i.e. someone is scanning in parallel, or some
+# scans were rejected, or deleted).
+#
+# Exits the whole script when no more files can be found.
+#
+# Defines global variables:
+#
+# $NEXT_FILE  Next source file to examine
+# $NEXT_BASE  Same file, stripped of its extension
+#
+get_next_file() {
+	for NEXT_FILE in ./*.pnm ; do
+		NEXT_BASE="${NEXT_FILE:0:${#NEXT_FILE}-4}"
+		if [ -e "${NEXT_BASE}.jpg"  -o  -e "${NEXT_BASE}.png" ]; then
+			NEXT_BASE=""
+			continue
+		else
+			break
+		fi
+	done
+	if [ -z "$NEXT_BASE"  -o  "$NEXT_BASE" = "./*.pnm" ]; then
+		echo "***   No more PNM files, exiting."
+		echo
+		exit 0
+	fi
+}
+
+# Ask which post-processing to apply
+#
+# CAUTION: Expects to be used inside a loop; invokes 'continue' and 'break'.
+#
+FORMAT="?"
+select_format() {
+	if [ $IS_INTERACTIVE = "1"  -o  $FORMAT = "?"  -o  $FORMAT = "v"  -o  $FORMAT = "V" ]; then
+
+		# Ask differently depending on mode
+		if [ $IS_INTERACTIVE = "1" ]; then
+			read -N 1 -p "***   Format of '${NEXT_FILE}': [PMORLWXBpmorlwxb] [V=View] [?=Help] [Q=Quit] " FORMAT
+		else
+			read -N 1 -p "***   Format of this batch: [PMORLWXBpmorlwxb] [V=View example] [?=Help] [Q=Quit] " FORMAT
+		fi
+		echo
+
+		# Display help, quit, image if requested
+		case $FORMAT in
+			v|V)
+				show $NEXT_FILE
+				continue
+			;;
+			q|Q)
+				echo
+				break
+			;;
+			\?)
+				echo
+				echo "***   Available formats:"
+				echo "      P  Photo          PNG"
+				echo "      M  Magazine       JPEG 89%  deskew, despeckle"
+				echo "      O  OCR-ready      PNG       B&W for 600dpi"
+				echo "      R  OCR-reduced    PNG       B&W for 300dpi-"
+				echo "      L  Line-art       PNG       deskew, whitenBG, crop, 16-colors"
+				echo "      W  White BG       JPEG 75%  deskew, whitenBG, crop"
+				echo "      X  White BG 1/2x  JPEG 75%  deskew, whitenBG, crop, scale 1/2x"
+				echo "      B  Basic          JPEG 75%  deskew"
+				echo "      Lowercase = normal   UPPERCASE = rotated 90 degrees"
+				echo
+				continue
+			;;
+		esac
+
+	fi
+}
+
+# Set up rotation if input was uppercase
+#
+# Defines global variable:
+#
+# $ROTATE  An ImageMagick command, or nothing
+#
+set_rotation() {
+	case $FORMAT in
+		A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|R|S|T|U|V|W|X|Y|Z)
+			ROTATE="-rotate 90"
+		;;
+		a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|r|s|t|u|v|w|x|y|z)
+			ROTATE=""
+		;;
+	esac
+}
+
+# Perform requested post-processing
+#
+HALF="-scale 50%"
+# WARNING: A fuzz too high here autocrops to useful content; then $AUTOCROP
+# will remove some because useful content touches the edge.
+DESKEW="-fuzz 5% -set option:deskew:auto-crop 5 -deskew 40% +repage"
+DESPECKLE="-despeckle"
+GRAYSCALE="-colorspace gray"
+LEVELS="-normalize"
+BLUR="-blur 3x.9"
+WHITEN50="-white-threshold 50%"
+WHITEN55="-white-threshold 55%"
+WHITEN60="-white-threshold 60%"
+WHITEN65="-white-threshold 65%"
+WHITEN70="-white-threshold 70%"
+WHITEN75="-white-threshold 75%"
+AUTOCROP="-bordercolor gray44 -border 1x1 -fuzz 51% -fill white -floodfill +0+0 gray44 -shave 1x1 -fuzz 51% -trim +repage"
+BORDER20="-bordercolor white -border 20x20"
+BORDER50="-bordercolor white -border 50x50"
+BW50="-threshold 50% -depth 1"
+BW55="-threshold 55% -depth 1"
+BW60="-threshold 60% -depth 1"
+BW65="-threshold 65% -depth 1"
+BW70="-threshold 70% -depth 1"
+BW75="-threshold 75% -depth 1"
+QUALITY="95"
+ROTATE=""
+postprocess() {
+	case $FORMAT in
+		p|P)
+			convert -verbose ${NEXT_FILE} $ROTATE -quality 95 ${NEXT_BASE}.png
+			approve ${NEXT_BASE}.png ${NEXT_FILE}
+		;;
+		m|M)
+			convert -verbose ${NEXT_FILE} $ROTATE $DESKEW $DESPECKLE $LEVELS -quality 89 ${NEXT_BASE}.jpg
+			approve ${NEXT_BASE}.jpg ${NEXT_FILE}
+		;;
+		o|O)
+			convert -verbose ${NEXT_FILE} $ROTATE $DESKEW $GRAYSCALE $LEVELS $BLUR $WHITEN65 $AUTOCROP $BORDER50 $BW65 -quality 95 ${NEXT_BASE}.png
+			approve ${NEXT_BASE}.png ${NEXT_FILE}
+		;;
+		r|R)
+			convert -verbose ${NEXT_FILE} $ROTATE $DESKEW $GRAYSCALE $LEVELS       $WHITEN50 $AUTOCROP $BORDER20 $BW50 -quality 95 ${NEXT_BASE}.png
+			approve ${NEXT_BASE}.png ${NEXT_FILE}
+		;;
+		l|L)
+			convert -verbose ${NEXT_FILE} $ROTATE $DESKEW            $LEVELS       $WHITEN50 $AUTOCROP $BORDER20       -quality 95 -depth 4 ${NEXT_BASE}.png
+			approve ${NEXT_BASE}.png ${NEXT_FILE}
+		;;
+		w|W)
+			convert -verbose ${NEXT_FILE} $ROTATE $DESKEW            $LEVELS       $WHITEN65 $AUTOCROP $BORDER20       -quality 75 ${NEXT_BASE}.jpg
+			approve ${NEXT_BASE}.jpg ${NEXT_FILE}
+		;;
+		x|X)
+			convert -verbose ${NEXT_FILE} $ROTATE $DESKEW            $LEVELS       $WHITEN65 $AUTOCROP $BORDER20       $HALF -quality 75 ${NEXT_BASE}.jpg
+			approve ${NEXT_BASE}.jpg ${NEXT_FILE}
+		;;
+		b|B)
+			convert -verbose ${NEXT_FILE} $ROTATE $DESKEW            $LEVELS                                           -quality 75 ${NEXT_BASE}.jpg
+			approve ${NEXT_BASE}.jpg ${NEXT_FILE}
+		;;
+		*)
+			echo "***   ERROR: Unknown format $FORMAT"
+		;;
+	esac
+}
+
+# Ask whether the session should be interactive
+#
+# Defines global variable:
+#
+# $IS_INTERACTIVE  1 means true
+#
+IS_INTERACTIVE=1
+select_interactivity() {
+	read -N 1 -p "***   Will this be an interactive session? [YN] " INTERACTION
+	echo
+	case $INTERACTION in
+		y|Y)  IS_INTERACTIVE=1 ;;
+		*)    IS_INTERACTIVE=0 ;;
+	esac
+}
+
+# Make sure dependencies are met
+check_deps() {
+	DEPS="convert $PREVIEWER"
+	ERRORS=0
+	for prog in $DEPS; do
+		if [ -z "`which $prog`" ]; then
+			ERRORS=1
+			echo "${0}: Please install '$prog' before using this program."
+		fi
+	done
+	if [ $ERRORS -gt 0 ]; then
+		exit 1
+	fi
+}
+
+
+## MAIN PROGRAM
+
+check_deps
+echo
+select_interactivity
+while true; do
+	get_next_file
+	select_format
+	set_rotation
+	postprocess
+done
+exit 0

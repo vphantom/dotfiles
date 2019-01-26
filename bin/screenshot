@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# Add -silent to xwd if you don't want the PC speaker beep.
+# I ended up preferring the feedback it provides.
+#
+# Uses ImageMagick's convert
+#
+# Quality 90 (undocumented) means compression 9 (max), filtering 0 (none).
+# For photographic content, filtering 5 might be better, but for typical
+# screenshots, 90 yields the smallest files.
+#
+# Could use netpbm instead with:
+# xwd |xwdtopnm |pnmtopng >file.png
+#
+MAGIC="`date "+%Y-%m-%d_%H%M%S_%N_"`$$"
+FILE="/tmp/screenshot-$MAGIC.png"
+PNGQUALITY=90
+
+if [ ".$1." = ".-w." ]; then
+	echo ">>>   lis screenshot window"
+	#xwd -nobdrs -id `xprop -root |grep '_NET_ACTIVE_WINDOW(WINDOW)' |grep -E -o '0x[0-9a-f]+'` |convert - -quality $PNGQUALITY $FILE
+	#scrot -buz -q100 $FILE
+	xfce4-screenshooter -m -w -o ~/bin/screenshot.save
+else
+	echo ">>>   lis screenshot fullscreen"
+	#xwd -root |convert - -quality $PNGQUALITY $FILE
+	#scrot -z -q100 $FILE
+	xfce4-screenshooter -m -f -o ~/bin/screenshot.save
+fi
+#advpng -z $FILE

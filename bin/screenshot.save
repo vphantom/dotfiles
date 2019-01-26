@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Second half of the xfce4-screenshooter workaround script.
+# (We're tolerating it vs scrot to get mouse pointer.)
+#
+MAGIC="`date "+%Y-%m-%d_%H%M%S_%N_"`$$"
+FILE="/tmp/screenshot-$MAGIC.png"
+
+mv "$1" "$FILE"
+advpng -z $FILE

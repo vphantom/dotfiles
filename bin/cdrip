@@ -1,0 +1,61 @@
+#!/bin/sh
+
+case $1 in
+	# Temporarily not supporting "all": cddb phase changes directories around.
+	rip|cddb|flac|vorbis|encode|clean)
+		echo "${VERSION}"
+	;;
+	*)
+		cat <<__SLEOF__
+Usage: ${0} mode
+
+Mode    Description
+-------+---------------------------------------------------------
+rip     1.   Invoke cdparanoia on all tracks.
+cddb    2.   Query CDDB, rename WAV files and create TAGS files.
+  # Here, you must cd Artist/Album/ before proceeding.
+flac    3.   Encode WAV into FLAC, import TAGS into result.
+vorbis  4.   Encode FLAC files into OGG, preserving TAGS.
+encode  3+4. Encode WAV into FLAC, import tags, encode FLAC into OGG w/ tags.
+clean   5.   Remove WAV, TAGS and cdparanoia LOG files, interactively.
+__SLEOF__
+		exit 1
+	;;
+esac
+
+if [ ".${1}." = ".clean." ]; then
+	echo "Cleaning up..."
+	rm -i *.wav *.tags *.log
+fi
+
+if [ ".${1}." = ".all."  -o  ".${1}." = ".rip." ]; then
+	echo "Ripping..."
+	cdparanoia --log-summary --batch
+fi
+
+if [ ".${1}." = ".all."  -o  ".${1}." = ".cddb." ]; then
+	echo "Querying CDDB..."
+	mycddb
+fi
+
+if [ ".${1}." = ".all."  -o  ".${1}." = ".encode."  -o  ".${1}." = ".flac." ]; then
+	echo "Encoding FLAC..."
+	# (Important for album gain to invoke flac on all files at once.)
+	flac --verify --replay-gain --best *.wav
+	for i in *.flac; do
+		LANG=fr_CA.ISO-8859-1 metaflac --import-tags-from="${i}.tags" "${i}"
+	done
+fi
+
+if [ ".${1}." = ".all."  -o  ".${1}." = ".encode."  -o  ".${1}." = ".vorbis." ]; then
+	echo "Encoding Vorbis..."
+	# <5 uses "metallic sounding" noise compensation schemes (as all MP3s do)
+	# 5 == 160-192kbps, survey says: achieves transparency
+	# 6 == 192-224kbps, has more separate audio processing, I hear more than most
+	oggenc -q 6 *.flac
+	# FLAC's gain seems to be affected by Vorbis encoding, trust vorbisgain more.
+	vorbisgain -a *.ogg
+fi
+
+echo "Done."
+exit 0

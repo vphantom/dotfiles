@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+
+# Strangely, since my new 2015 setup, JPEG2000 takes 3x the space of JPEG
+# instead of 0.6-0.8x!  Disabling for now. :(
+
+sudo mount --bind /home/lis /razor/home/lis
+rm -f scan*.bg.jp*
+sudo chroot --userspec=lis:lis /razor/ /bin/sh -c "cd \"`pwd`\" ; pdfbeads -B 150 -b JPEG     -o book-lossy-jpeg150dpi.pdf"
+#sudo chroot --userspec=lis:lis /razor/ /bin/sh -c "cd \"`pwd`\" ; pdfbeads -B 150 -b JPEG2000 -o book-lossy-jp2k150dpi.pdf"
+rm -f scan*.bg.jp*
+sudo chroot --userspec=lis:lis /razor/ /bin/sh -c "cd \"`pwd`\" ; pdfbeads -B 300 -b JPEG     -o book-lossy-jpeg300dpi.pdf"
+#sudo chroot --userspec=lis:lis /razor/ /bin/sh -c "cd \"`pwd`\" ; pdfbeads -B 300 -b JPEG2000 -o book-lossy-jp2k300dpi.pdf"
+sudo umount /razor/home/lis
