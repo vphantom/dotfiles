@@ -7,3 +7,7 @@
 	helper = cache
 [push]
 	default = simple
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false

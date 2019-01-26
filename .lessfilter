@@ -1,0 +1,17 @@
+#!/bin/sh
+
+case "$1" in
+	*.txt.asc|*.txt.gpg|*.txt.pgp)
+		gpg --batch -d "$1"
+		;;
+	*.epub)
+		epub.py -d -c "${COLUMNS:=78}" "$1"
+		;;
+	*.sxc)
+		ssconvert -T Gnumeric_stf:stf_csv "$1" 'fd://1' 2>/dev/null
+		;;
+	*)
+		# Let lesspipe/lessfile handle the input.
+		exit 1
+esac
+exit 0
