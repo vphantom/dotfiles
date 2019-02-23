@@ -1,0 +1,14 @@
+" Project overrides for Vim
+" See: http://www.vim.org/scripts/script.php?script_id=441
+" I use it with the following in my .vimrc:
+" let g:localvimrc_persistent=2
+" let g:localvimrc_event=["BufWinEnter","BufReadPre","BufNewFile"]
+if &filetype =~ 'css'
+   setlocal noexpandtab
+   setlocal tabstop=8
+   setlocal shiftwidth=4
+   setlocal softtabstop=4
+	setlocal errorformat+=%f:\ line\ %l\\,\ col\ %c\\,\ %trror\ -\ %m
+	setlocal errorformat+=%f:\ line\ %l\\,\ col\ %c\\,\ %tarning\ -\ %m
+   let &l:makeprg=g:localvimrc_script_dir."/node_modules/.bin/csslint --format=compact --ignore=import %"
+endif
