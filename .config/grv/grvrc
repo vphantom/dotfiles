@@ -1,0 +1,24 @@
+# The "solarized" theme has nice colors but abysmal contrast, so ugly "classic" it is!
+set theme classic
+
+# Pretty display
+set tabwidth 4
+set commit-graph true
+
+# Mouse support
+set mouse true
+# Unfortunately, scrolling is broken through Tmux. Oh well.
+
+# Hotkey to filter by message keyword, without quotes
+def FilterMessages {
+	evalkeys "<grv-filter-prompt>message REGEXP \"$1\"<Enter>"
+}
+map CommitView l ":FilterMessages "
+
+# Hotkey to quit
+map All q ":q<Enter>"
+
+# Quick hack to enter my preferred layout
+evalkeys <grv-next-view>
+evalkeys <grv-next-view>
+evalkeys <grv-toggle-view-layout>
