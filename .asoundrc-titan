@@ -1,0 +1,11 @@
+defaults.pcm.card 1
+defaults.pcm.device 0
+defaults.ctl.card 1
+#pcm.!default {
+#	type hw
+#	card 1
+#	device 0
+#}
+# For Skype based on http://superuser.com/a/832459
+pcm.unwantedpulse { type pulse }
+ctl.unwantedpulse { type pulse }

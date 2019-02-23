@@ -1,0 +1,22 @@
+# Private stuff
+.aegisub
+.audacity-data
+.avidemux*
+.config
+.local
+.muttrc
+.vnc
+
+# Caches, temp files, redundant stuff
+.vim/.netrwhist
+.vim/autoload
+.vim/plugged
+.wireshark/recent*
+
+# Stuff nobody else could care about
+.bash_logout
+.dmrc
+.vuescan
+.wireshark
+.xpdfrc
+.xserverrc

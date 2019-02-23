@@ -38,6 +38,13 @@ Plug 'Raimondi/delimitMate'
 Plug 'tomtom/tcomment_vim'
 "Plug 'tpope/vim-surround'
 
+" Different syntax for a portion of a file
+"
+" (Unfortunately this is ephemeral, but better than nothing.)
+Plug 'inkarkat/vim-ingo-library'
+Plug 'inkarkat/vim-SyntaxRange'
+Plug 'inkarkat/vim-SearchHighlighting'
+
 " Code formatter
 "
 " What does this offer that ALEFix doesn't?

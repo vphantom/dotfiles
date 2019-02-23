@@ -51,17 +51,24 @@ set sidescrolloff=12
 set showtabline=2
 let g:lightline = {
 			\ 'component': {
-			\   'readonly': '%{&readonly?"RO":""}',
+			\   'readonly': '%{&readonly?"🚫":""}',
 			\ },
 			\ 'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
 			\ 'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" }
 			\ }
+" Maybe create our own bufferline?
+" See: https://github.com/itchyny/lightline.vim/issues/43#issuecomment-37011534
+" He does it for tabs, but bufnr() and co. can do the trick for buffers.
 let g:lightline.tabline = {'left': [['buffers']], 'right': [['close']]}
 let g:lightline.component_expand = {'buffers': 'lightline#bufferline#buffers'}
 let g:lightline.component_type = {'buffers': 'tabsel'}
 let g:lightline#bufferline#modified = ' 💡'
 let g:lightline#bufferline#read_only = ' 🚫'
 let g:lightline#bufferline#unnamed = 'untitled'
+" Uses pathshorten() from Vim which is sadly inadequate compared to VScode's
+" We might have to write our own to only show key differences.
+let g:lightline#bufferline#filename_modifier = ':~:.'
+let g:lightline#bufferline#shorten_path = '1'
 
 
 " Other behavior
@@ -106,7 +113,9 @@ set foldlevel=25
 " (The thing's so buggy that it's best to stick with defaults.)
 let g:netrw_banner = 0
 set fillchars+=vert:│
-set autochdir
+" Netrw seems to open in the current buffer's directory EVEN WITHOUT this.
+" Disabling autochdir makes lightline-bufferline's shortened paths tolerable.
+"set autochdir
 autocmd FileType netrw setl bufhidden=wipe
 
 
@@ -115,6 +124,9 @@ autocmd FileType netrw setl bufhidden=wipe
 set mouse=nvi
 set ttymouse=sgr
 set timeoutlen=1000 ttimeoutlen=0
+" Escape without ESC
+inoremap jk <Esc>
+inoremap kj <Esc>
 " Basic tab/buffer navigation
 map <C-PageUp> :bprevious<cr>
 map <C-PageDown> :bnext<cr>

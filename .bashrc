@@ -124,6 +124,10 @@ export QT_IM_MODULE=ibus
 # OPAM configuration
 . /home/lis/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 
+# FZF
+source /usr/share/doc/fzf/examples/key-bindings.bash
+
+
 # In how many hours will $2 hours be reached if we've done $1 already?
 function eta {
 	if [ -z "$2" ]; then echo "Usage: eta done target"; return; fi
