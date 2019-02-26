@@ -15,8 +15,19 @@ def FilterMessages {
 }
 map CommitView l ":FilterMessages "
 
+# Hotkey to edit current file
+map CommitView e ":@tmux new-window vi ${repo-workdir}/${file}<Enter>"
+map DiffView e ":@tmux new-window vi ${repo-workdir}/${file}<Enter>"
+map StatusView e ":@tmux new-window vi ${repo-workdir}/${file}<Enter>"
+
 # Hotkey to quit
-map All q ":q<Enter>"
+# (Don't map "All" because that would break pop-up dismissal.)
+map CommitView q ":q<Enter>"
+map DiffView q ":q<Enter>"
+map GitStatusView q ":q<Enter>"
+map GitSummaryView q ":q<Enter>"
+map RefView q ":q<Enter>"
+map RemoteView q ":q<Enter>"
 
 # Quick hack to enter my preferred layout
 evalkeys <grv-next-view>
