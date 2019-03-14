@@ -37,6 +37,7 @@ Plug 'Raimondi/delimitMate'
 "Plug 'ludovicchabant/vim-gutentags' HIGH CPU CONSUMPTION
 Plug 'tomtom/tcomment_vim'
 "Plug 'tpope/vim-surround'
+Plug 'Yggdroot/indentLine'
 
 " Different syntax for a portion of a file
 "

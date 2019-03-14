@@ -178,6 +178,11 @@ match ExtraWhitespace /\s\+$/
 set list
 set listchars=tab:│\ ,nbsp:⎵
 highlight SpecialKey ctermfg=lightgray guifg=lightgray
+" The indentLine plugin adds similar pipes for space identations, although invisible in the cursorline.
+let g:indentLine_char = '│'
+let g:indentLine_color_term = 250
+let g:indentLine_color_gui = "#cccccc"
+let g:indentLine_concealcursor = ''
 " Comment keyword highlights
 " Thanks to: https://vi.stackexchange.com/a/15531
 highlight clear Todo
@@ -205,8 +210,10 @@ au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
 
 " Language-specific
 "
+au Filetype ocaml setlocal tabstop=2 expandtab shiftwidth=2 textwidth=80
 let g:javascript_plugin_jsdoc = 1
 let g:markdown_fenced_languages = ['css', 'html', 'ini=dosini', 'sh', 'perl', 'ocaml', 'js=javascript']
+let perl_include_pod = 1
 " Reformat JSON upon loading, not just when ALE fixes it on saving.
 au FileType json :% ! jq .
 
@@ -221,6 +228,7 @@ highlight ALEErrorSign ctermfg=white guifg=white ctermbg=10 guibg=#ebebeb
 let g:ale_sign_warning = '🔔'
 highlight ALEWarningSign ctermfg=white guifg=white ctermbg=10 guibg=#ebebeb
 let g:ale_fix_on_save = 1
+let g:ale_lint_on_text_changed = 'normal'
 "let g:ale_linters_explicit = 1
 "let g:ale_linters = {
 "			\'ocaml': ['ols'],
@@ -234,9 +242,9 @@ let g:ale_fixers = {
 "let g:ale_javascript_prettier_options = '--single-quote --trailing-comma es5'
 "let g:ale_javascript_prettier_options = '--tab-width=4 --use-tabs'
 let g:ale_css_prettier_options = '--tab-width=4 --use-tabs'
-let g:ale_ocaml_ocamlformat_options = '--profile=janestreet --wrap-comments'
+" Not using: --margin=132  because OCaml, and Jane Street's profile in particular, is very dense
+let g:ale_ocaml_ocamlformat_options = '--profile=janestreet --wrap-comments --doc-comments=before --sequence-style=terminator'
 " TODO: JS, I get eslint warnings yet it says Prettier only above, wtf?
-" TODO: OCaml, just ocamlformat?
 " TODO: Reason ?
 " TODO: Perl, do we bother? Would perl-critic help catch bugs or juts formatting?
 filetype plugin on
