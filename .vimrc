@@ -50,6 +50,9 @@ set scrolloff=3
 set sidescrolloff=12
 set showtabline=2
 let g:lightline = {
+			\ 'component_function': {
+			\   'percent': 'noscrollbar#statusline'
+			\ },
 			\ 'component': {
 			\   'readonly': '%{&readonly?"🚫":""}',
 			\ },
@@ -69,7 +72,6 @@ let g:lightline#bufferline#unnamed = 'untitled'
 " We might have to write our own to only show key differences.
 let g:lightline#bufferline#filename_modifier = ':~:.'
 let g:lightline#bufferline#shorten_path = '1'
-
 
 " Other behavior
 "
@@ -210,12 +212,11 @@ au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
 
 " Language-specific
 "
-au Filetype ocaml setlocal tabstop=2 expandtab shiftwidth=2 textwidth=80
+au Filetype ocaml setlocal tabstop=2 expandtab shiftwidth=2 textwidth=80 formatoptions-=r
+au Filetype markdown setlocal wrap formatoptions-=tcq
 let g:javascript_plugin_jsdoc = 1
-let g:markdown_fenced_languages = ['css', 'html', 'ini=dosini', 'sh', 'perl', 'ocaml', 'js=javascript']
+let g:markdown_fenced_languages = ['css', 'html', 'ini=dosini', 'sh', 'perl', 'ocaml', 'js=javascript', 'sexp=scheme']
 let perl_include_pod = 1
-" Reformat JSON upon loading, not just when ALE fixes it on saving.
-au FileType json :% ! jq .
 
 
 " ALE
@@ -227,6 +228,8 @@ let g:ale_sign_error = '⛔'
 highlight ALEErrorSign ctermfg=white guifg=white ctermbg=10 guibg=#ebebeb
 let g:ale_sign_warning = '🔔'
 highlight ALEWarningSign ctermfg=white guifg=white ctermbg=10 guibg=#ebebeb
+highlight SpellBad ctermbg=10 guibg=#ffe0e8
+highlight SpellCap ctermbg=10 guibg=#e0f0ff
 let g:ale_fix_on_save = 1
 let g:ale_lint_on_text_changed = 'normal'
 "let g:ale_linters_explicit = 1
@@ -243,7 +246,8 @@ let g:ale_fixers = {
 "let g:ale_javascript_prettier_options = '--tab-width=4 --use-tabs'
 let g:ale_css_prettier_options = '--tab-width=4 --use-tabs'
 " Not using: --margin=132  because OCaml, and Jane Street's profile in particular, is very dense
-let g:ale_ocaml_ocamlformat_options = '--profile=janestreet --wrap-comments --doc-comments=before --sequence-style=terminator'
+" Jane Street's profile is documented at: https://github.com/ocaml-ppx/ocamlformat/blob/master/src/Conf.ml
+let g:ale_ocaml_ocamlformat_options = '--profile=janestreet -m 80 --parse-docstrings --wrap-comments --no-break-infix-before-func'
 " TODO: JS, I get eslint warnings yet it says Prettier only above, wtf?
 " TODO: Reason ?
 " TODO: Perl, do we bother? Would perl-critic help catch bugs or juts formatting?
@@ -262,7 +266,6 @@ highlight GitGutterChange ctermfg=black guifg=black ctermbg=blue guibg=#87dfff
 highlight GitGutterChangeDelete ctermfg=black guifg=black ctermbg=blue guibg=#87dfff
 highlight GitGutterDelete ctermfg=white guifg=white ctermbg=red guibg=#df2f50
 
-
 " I wanted undercurls, but they are still not merged in Vim as of 2019-01-25
 "
 " Neovim's latest seems to support it?
@@ -272,9 +275,6 @@ highlight GitGutterDelete ctermfg=white guifg=white ctermbg=red guibg=#df2f50
 "set t_Cs="\e[4:3m\e[58;5;9m"
 "highlight SpellBad gui=undercurl cterm=undercurl guisp=Red guibg=NONE
 "highlight SpellCap gui=undercurl cterm=undercurl guisp=Blue guibg=NONE
-"" Why is the following IGNORED ?
-"highlight ALEError gui=undercurl cterm=undercurl guisp=Red guibg=White
-"highlight ALEWarning gui=underline cterm=underline guisp=Orange guibg=White
 
 
 " ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line

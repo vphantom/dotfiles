@@ -9,6 +9,12 @@ call plug#begin('~/.vim/plugged')
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 
+" Scroll bar
+"
+" Doesn't follow scroll, removes gitgutter & co! :(
+"Plug 'lornix/vim-scrollbar'
+Plug 'gcavallanti/vim-noscrollbar'
+
 " Git
 "
 Plug 'airblade/vim-gitgutter'
@@ -19,7 +25,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'w0rp/ale'
 
 " Markdown live preview
-"Plug 'iamcco/markdown-preview.vim'
+Plug 'iamcco/markdown-preview.vim'
 
 " Languages
 "

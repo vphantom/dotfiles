@@ -37,8 +37,8 @@ fi
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 alias netstat="netstat -tuw"
-alias ls="ls --color=auto"
-alias ll="ls --time-style=long-iso --group-directories-first -hlptr"
+alias ls="ls --color=auto --group-directories-first"
+alias ll="ls --time-style=long-iso -hlptr"
 alias dir="ls -hAl"
 alias dri="dir"
 alias idr="dir"
