@@ -79,8 +79,6 @@ set nospell
 let loaded_matchparen=1
 set wildmenu
 set wildmode=list:longest
-let g:localvimrc_persistent=2
-let g:localvimrc_event=["BufWinEnter","BufReadPre","BufNewFile"]
 " Jump to the last position when reopening a file
 au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 " Clean up after closing quick fix window
@@ -217,6 +215,15 @@ au Filetype markdown setlocal wrap formatoptions-=tcq
 let g:javascript_plugin_jsdoc = 1
 let g:markdown_fenced_languages = ['css', 'html', 'ini=dosini', 'sh', 'perl', 'ocaml', 'js=javascript', 'sexp=scheme']
 let perl_include_pod = 1
+" My only use of Template::Toolkit uses non-standard tags
+let b:tt2_syn_tags = '{{ }}'
+
+
+" My special paths
+"
+" Unfortunately, plugin https://github.com/embear/vim-localvimrc slows buffer switching to a crawl at 100% CPU.
+au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/*/html/* set ft=mason
+au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/*/web/templates/* set ft=tt2html
 
 
 " ALE

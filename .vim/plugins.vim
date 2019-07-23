@@ -1,5 +1,10 @@
 call plug#begin('~/.vim/plugged')
 
+" Local .lvimrc files
+"
+" Slows tab switching to a crawl at 100% CPU
+"Plug 'embear/vim-localvimrc'
+
 " Friendlier sessions
 "
 "Plug 'tpope/vim-obsession'
