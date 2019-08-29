@@ -88,6 +88,7 @@ au QuickFixCmdPost [^l]* redraw! | cwindow
 command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | diffthis
 " Yank to system CLIPBOARD and PRIMARY
 set clipboard=unnamed,unnamedplus,exclude:cons\|linux
+let g:tagbar_sort = 0
 
 
 " Searching
@@ -135,6 +136,8 @@ map [6;5~ :bnext<cr>
 map <C-W> :bd<cr>
 " File explorer
 map = :Explore<cr>
+" Tag explorer
+map - :TagbarOpenAutoClose<cr>
 " Reset highlight: complement to '*' and search results
 map <leader>8 :noh<cr>
 map  :%s/
@@ -248,13 +251,12 @@ let g:ale_fixers = {
 			\'css': ['prettier'],
 			\'json': ['jq'],
 			\'ocaml': ['ocamlformat'],
+			\'reason': ['refmt'],
 			\}
 "let g:ale_javascript_prettier_options = '--single-quote --trailing-comma es5'
 "let g:ale_javascript_prettier_options = '--tab-width=4 --use-tabs'
+let g:ale_javascript_prettier_options = '--single-quote'
 let g:ale_css_prettier_options = '--tab-width=4 --use-tabs'
-" Not using: --margin=132  because OCaml, and Jane Street's profile in particular, is very dense
-" Jane Street's profile is documented at: https://github.com/ocaml-ppx/ocamlformat/blob/master/src/Conf.ml
-let g:ale_ocaml_ocamlformat_options = '--profile=janestreet -m 80 --parse-docstrings --wrap-comments --no-break-infix-before-func'
 " TODO: JS, I get eslint warnings yet it says Prettier only above, wtf?
 " TODO: Reason ?
 " TODO: Perl, do we bother? Would perl-critic help catch bugs or juts formatting?

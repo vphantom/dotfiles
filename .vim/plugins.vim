@@ -49,6 +49,7 @@ Plug 'Raimondi/delimitMate'
 Plug 'tomtom/tcomment_vim'
 "Plug 'tpope/vim-surround'
 Plug 'Yggdroot/indentLine'
+Plug 'majutsushi/tagbar'
 
 " Different syntax for a portion of a file
 "
