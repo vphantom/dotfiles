@@ -36,11 +36,34 @@ endif
 "set background=dark
 colorscheme lisvscode
 
+" Distinguish insert mode
+"
+" Cursor:
+" 0 -> blinking block
+" 1 -> blinking block (default)
+" 2 -> steady block
+" 3 -> blinking underline
+" 4 -> steady underline
+" 5 -> blinking bar (xterm)
+" 6 -> steady bar (xterm)
+let &t_SI = "\e[6 q"  "Insert
+let &t_EI = "\e[2 q"  "Command
+silent execute "!echo -ne '" . escape("\033]12;#ff8800\7", "%#!") . "'"
+" reset cursor when vim exits
+autocmd VimLeave * silent !echo -ne "\033]112\007"
+
+" Cursor line:
+:set nocul
+:au InsertEnter * set cul
+:au InsertLeave * set nocul
+" Change Color when entering Insert Mode
+" au InsertEnter * hi CursorLine guibg=#e0f0ff
+" Revert Color to default when leaving Insert Mode
+" au InsertLeave * hi CursorLine guibg=#ebebeb
 
 " Layout
 "
 set noflash
-set cursorline
 set modeline
 set title
 set ruler
