@@ -50,6 +50,7 @@ Plug 'tomtom/tcomment_vim'
 "Plug 'tpope/vim-surround'
 Plug 'Yggdroot/indentLine'
 Plug 'majutsushi/tagbar'
+Plug 'ervandew/supertab'
 
 " Different syntax for a portion of a file
 "

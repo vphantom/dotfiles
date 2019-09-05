@@ -230,13 +230,16 @@ highlight myHlCool ctermfg=black guifg=black ctermbg=red guibg=#77dd77
 
 " Omni
 "
+:set completeopt=menuone,preview,longest
 " Auto-close omni preview window when we leave the menu
 au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
-
+let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
+let g:SuperTabLongestHighlight = 1
 
 " Language-specific
 "
 au Filetype ocaml setlocal tabstop=2 expandtab shiftwidth=2 textwidth=80 formatoptions-=r
+let g:merlin_completion_with_doc = 1
 au Filetype markdown setlocal wrap formatoptions-=tcq
 let g:javascript_plugin_jsdoc = 1
 let g:markdown_fenced_languages = ['css', 'html', 'ini=dosini', 'sh', 'perl', 'ocaml', 'js=javascript', 'sexp=scheme']
