@@ -7,7 +7,6 @@ set commit-graph true
 
 # Mouse support
 set mouse true
-# Unfortunately, scrolling is broken through Tmux. Oh well.
 
 # Hotkey to filter by message keyword, without quotes
 def FilterMessages {

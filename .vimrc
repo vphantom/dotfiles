@@ -251,6 +251,7 @@ let b:tt2_syn_tags = '{{ }}'
 " My special paths
 "
 " Unfortunately, plugin https://github.com/embear/vim-localvimrc slows buffer switching to a crawl at 100% CPU.
+au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/* set fenc=latin1
 au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/*/html/* set ft=mason
 au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/*/web/templates/* set ft=tt2html
 
@@ -300,6 +301,8 @@ highlight GitGutterAdd ctermfg=black guifg=black ctermbg=green guibg=#afdf00
 highlight GitGutterChange ctermfg=black guifg=black ctermbg=blue guibg=#87dfff
 highlight GitGutterChangeDelete ctermfg=black guifg=black ctermbg=blue guibg=#87dfff
 highlight GitGutterDelete ctermfg=white guifg=white ctermbg=red guibg=#df2f50
+map <leader>s :let @g = system("git blame -c -L " . line(".") . ",+1 " . expand("%"))<cr>:echomsg @g<cr>
+"map <leader>s :Gblame<cr>
 
 " I wanted undercurls, but they are still not merged in Vim as of 2019-01-25
 "
