@@ -54,11 +54,11 @@ titlepng() {
 	convert "$1" -pointsize 36 "label:$2" +swap -gravity Center -append "${1}-titled.png"
 }
 
-alias mux="tmux new-session -A -D -s local"
 alias df="df -h --total"
 alias rm="rm -i"
 alias cp="cp -i"
 alias mv="mv -i"
+alias grep="grep --color"
 alias relirc="sudo /etc/init.d/lirc stop ; sudo rmmod lirc_serial lirc_dev ; sudo /etc/init.d/lirc start"
 alias tt="TODOTXT_FINAL_FILTER='t.filter-relevance' t"
 alias mp="mplayer"

@@ -244,17 +244,10 @@ au Filetype markdown setlocal wrap formatoptions-=tcq
 let g:javascript_plugin_jsdoc = 1
 let g:markdown_fenced_languages = ['css', 'html', 'ini=dosini', 'sh', 'perl', 'ocaml', 'js=javascript', 'sexp=scheme']
 let perl_include_pod = 1
-" My only use of Template::Toolkit uses non-standard tags
-let b:tt2_syn_tags = '{{ }}'
 
-
-" My special paths
+" Graph X Paragon
 "
-" Unfortunately, plugin https://github.com/embear/vim-localvimrc slows buffer switching to a crawl at 100% CPU.
-au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/* set fenc=latin1
-au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/*/html/* set ft=mason
-au BufRead,BufNewFile ~/devel/graphx/merino-docker/www/*/web/templates/* set ft=tt2html
-
+source ~/src/graphx/.vimrc
 
 " ALE
 "
