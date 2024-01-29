@@ -1,13 +1,29 @@
 [user]
 	name = Stéphane Lavergne
 	email = lis@imars.com
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only --features=interactive
+[delta]
+	light = false  # dark background
+	line-numbers = true
+	diff-highlight = true
+[merge]
+	conflictstyle = diff3
+[diff]
+	colorMoved = default
 [color]
 	ui = auto
 [credential]
-	helper = cache
+	helper = store
 [push]
 	default = simple
 [diff]
 	tool = vimdiff
 [difftool]
 	prompt = false
+[pull]
+	rebase = false
+[fetch]
+	prune = true

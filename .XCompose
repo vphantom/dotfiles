@@ -1,3 +1,93 @@
 include "%L"
+<Multi_key> <comma> <c> : "Ç" Ccedilla
+<Multi_key> <c> <c> : "Ç" Ccedilla
+<dead_diaeresis> <C> : "Ç" Ccedilla
+<diaeresis> <C> : "Ç" Ccedilla
+<Multi_key> <less> <less> : "«" guillemotleft
+<Multi_key> <greater> <greater> : "»" guillemotright
+<Multi_key> <minus> <0> : "₀" U2080
+<Multi_key> <minus> <1> : "₁" U2081
+<Multi_key> <minus> <2> : "₂" U2082
+<Multi_key> <minus> <3> : "₃" U2083
+<Multi_key> <minus> <4> : "₄" U2084
+<Multi_key> <minus> <5> : "₅" U2085
+<Multi_key> <minus> <6> : "₆" U2086
+<Multi_key> <minus> <7> : "₇" U2087
+<Multi_key> <minus> <8> : "₈" U2088
+<Multi_key> <minus> <9> : "₉" U2089
+<Multi_key> <6> <0> : "⁰" U2070
+<Multi_key> <6> <1> : "¹" UB9
+<Multi_key> <6> <2> : "²" UB2
+<Multi_key> <6> <3> : "³" UB3
+<Multi_key> <6> <4> : "⁴" U2074
+<Multi_key> <6> <5> : "⁵" U2075
+<Multi_key> <6> <6> : "⁶" U2076
+<Multi_key> <6> <7> : "⁷" U2077
+<Multi_key> <6> <8> : "⁸" U2078
+<Multi_key> <6> <9> : "⁹" U2079
+<Multi_key> <8> <0> : "☆" U2606
+<Multi_key> <8> <minus> : "★" U2607
 <Multi_key> <period> <slash> : "♪" U266A
 <Multi_key> <comma> <slash> : "♫" U266B
+<Multi_key> <minus> <semicolon> : "÷" division
+<Multi_key> <semicolon> <minus> : "÷" division
+<Multi_key> <equal> <period> : "≥" U2265
+<Multi_key> <equal> <comma> : "≤" U2264
+<Multi_key> <minus> <equal> : "±" plusminus # PLUS-MINUS SIGN
+<Multi_key> <equal> <minus> : "±" plusminus # PLUS-MINUS SIGN
+<Multi_key> <equal> <equal> : "≅" U2245 # APPROXIMATELY EQUAL TO
+<Multi_key> <minus> <e> : "€" U20AC
+<Multi_key> <minus> <comma> : "←" U2190
+<Multi_key> <minus> <period> : "→" U2192
+<Multi_key> <comma> <minus> <period> : "⟷" U27F7
+<Multi_key> <comma> <period> : "⇄" U21C4
+<Multi_key> <backslash> <equal> : "↑" U2191
+<Multi_key> <backslash> <apostrophe> : "↓" U2193
+<Multi_key> <0> <0> : "☐" U2610
+<Multi_key> <0> <minus> : "☑" U2611
+<Multi_key> <0> <x> : "☒" U2612
+<Multi_key> <n> <o> : "№" U2116
+<Multi_key> <a> <a> : "α" U03B1
+<Multi_key> <b> <b> : "β" U03B2
+<Multi_key> <d> <d> : "Δ" U0394
+<Multi_key> <5> <o> : "‰" U2030
+<Multi_key> <1> <1> : "⚠" U26A0
+<Multi_key> <e> <s> : "😃" U1F603
+<Multi_key> <e> <p> : "😛" U1F61B
+<Multi_key> <e> <t> : "🤔" U1F914
+<Multi_key> <e> <slash> : "😕" U1F615
+<Multi_key> <e> <g> : "😬" U1F62C
+<Multi_key> <e> <o> : "😱" U1F631
+<Multi_key> <e> <apostrophe> : "😉" U1F609
+<Multi_key> <e> <w> : "🤢" U1F922
+<Multi_key> <e> <r> : "😡" U1F621
+<Multi_key> <e> <8> : "😎" U1F60E
+<Multi_key> <e> <h> : "🤨" U1F928
+<Multi_key> <4> <4> : "💲" U1F4B2
+<Multi_key> <i> <c> : "🛒" U1F6D2
+<Multi_key> <i> <m> : "💸" U1F4B8
+<Multi_key> <i> <p> : "🍽" U1F37D
+<Multi_key> <i> <t> : "☎" U260E
+<Multi_key> <i> <v> : "🚐" U1F690
+<Multi_key> <i> <e> : "✉" U2709
+<Multi_key> <i> <c> : "🏠" U1F3E0
+# Flags-ish...
+<Multi_key> <f> <q> : "🇶" U1F1F6
+<Multi_key> <f> <c> : "🇨" U1F1E8
+<Multi_key> <f> <a> : "🇦" U1F1E6
+<Multi_key> <f> <u> : "🇺" U1F1FA
+<Multi_key> <f> <s> : "🇸" U1F1F8
+# Box drawing
+<Multi_key> <KP_Subtract> <KP_7> : "┌" U250C
+<Multi_key> <KP_Subtract> <KP_8> : "─" U2500
+<Multi_key> <KP_Subtract> <KP_9> : "┐" U2510
+<Multi_key> <KP_Subtract> <KP_4> : "│" U2502
+<Multi_key> <KP_Subtract> <KP_6> : "│" U2502
+<Multi_key> <KP_Subtract> <KP_1> : "└" U2514
+<Multi_key> <KP_Subtract> <KP_2> : "─" U2500
+<Multi_key> <KP_Subtract> <KP_3> : "┘" U2518
+<Multi_key> <KP_Add> <KP_8> : "┬" U252C
+<Multi_key> <KP_Add> <KP_4> : "├" U251C
+<Multi_key> <KP_Add> <KP_5> : "┼" U253C
+<Multi_key> <KP_Add> <KP_6> : "┤" U2524
+<Multi_key> <KP_Add> <KP_2> : "┴" U2534

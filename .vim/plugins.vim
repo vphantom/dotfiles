@@ -1,9 +1,24 @@
 call plug#begin('~/.vim/plugged')
 
+" ATTENTION!
+"
+" Since upgrading to Vim 9 via AppImage I can no longer let Plug use Git on its
+" own because of incorrect SSL environment settings.  Instead, you have to run
+" 'git clone --depth=1 ...' manually before running PlugInstall.
+
+" Codeium
+"
+" AI context-aware code completion
+Plug 'Exafunction/codeium.vim', { 'branch': 'main' }
+
 " Local .lvimrc files
 "
 " Slows tab switching to a crawl at 100% CPU
 "Plug 'embear/vim-localvimrc'
+
+" FZF
+Plug 'junegunn/fzf'
+Plug 'junegunn/fzf.vim'
 
 " Friendlier sessions
 "
@@ -14,58 +29,38 @@ call plug#begin('~/.vim/plugged')
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 
-" Scroll bar
-"
-" Doesn't follow scroll, removes gitgutter & co! :(
-"Plug 'lornix/vim-scrollbar'
-Plug 'gcavallanti/vim-noscrollbar'
-
 " Git
 "
 Plug 'airblade/vim-gitgutter'
-"Plug 'tpope/vim-fugitive'
 
 " Interactive syntax check
 "
 Plug 'w0rp/ale'
 
-" Markdown live preview
-Plug 'iamcco/markdown-preview.vim'
-
 " Languages
 "
 "Plug 'ekalinin/Dockerfile.vim'
 Plug 'tpope/vim-markdown'
-Plug 'pangloss/vim-javascript'
-"BUNDLE reasonml-editor/vim-reason ???
+Plug 'pangloss/vim-javascript'  " Still necessary?
 Plug 'ap/vim-css-color'
 
 " Editing
 "
-" Auto-close parenthesis, brackets, quotes
-Plug 'Raimondi/delimitMate'
-" Rebuild tags quietly
-"Plug 'ludovicchabant/vim-gutentags' HIGH CPU CONSUMPTION
-Plug 'tomtom/tcomment_vim'
-"Plug 'tpope/vim-surround'
-Plug 'Yggdroot/indentLine'
+" Rebuild tags quietly (VERY HIGH CPU CONSUMPTION!)
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'tpope/vim-commentary'
+"Plug 'tpope/vim-surround'   " I never use this?
+Plug 'Yggdroot/indentLine'   " Might slow things down?
 Plug 'majutsushi/tagbar'
-Plug 'ervandew/supertab'
+" Doesn't do much with our structure, but slightly better than nothing:
+Plug 'c9s/perlomni.vim'
 
-" Different syntax for a portion of a file
-"
-" (Unfortunately this is ephemeral, but better than nothing.)
+" Inkarkat plugins
 Plug 'inkarkat/vim-ingo-library'
+" Different syntax for a portion of a file
+" (Unfortunately this is ephemeral, but better than nothing.)
 Plug 'inkarkat/vim-SyntaxRange'
+" Improve * command
 Plug 'inkarkat/vim-SearchHighlighting'
-
-" Code formatter
-"
-" What does this offer that ALEFix doesn't?
-"Plug 'Chiel92/vim-autoformat'
-"
-" Rainbow parenthesis
-" (BREAKS SYNTAX HIGHLIGHTING in OCaml)
-"Plug 'kien/rainbow_parentheses.vim'
 
 call plug#end()

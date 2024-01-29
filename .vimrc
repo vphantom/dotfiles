@@ -1,5 +1,17 @@
+set enc=utf-8
 scriptencoding utf-8
 set termencoding=utf-8
+" Doesn't seem to help:
+set ttyfast
+set lazyredraw
+set regexpengine=1
+
+" Escape without ESC
+set ttimeout
+set ttimeoutlen=50
+" The timeout (single T) is for maps and must remain longer
+inoremap jk <Esc>
+inoremap kj <Esc>
 
 " File I/O
 "
@@ -12,6 +24,12 @@ set ssop-=folds     " do not store folds
 " (You do NOT need to set 'hidden' with these.)
 set autowriteall
 au FocusLost * silent! update
+" Writes to tmp file at this frequency.
+" Default: 4000
+" Reduced because:
+" 1. We're in /tmp/ which is tmpfs
+" 2. Accelerates feedback from Gitgutter
+set updatetime=1000
 
 
 " Plugins
@@ -26,6 +44,7 @@ endif
 " 256 color theme
 "
 set termguicolors
+" XXX what did I use the following for?
 set t_ut=
 if &term =~# '^tmux'
 	let &t_8f = "\e[38;2;%lu;%lu;%lum"
@@ -56,6 +75,7 @@ autocmd VimLeave * silent !echo -ne "\033]112\007"
 :set nocul
 :au InsertEnter * set cul
 :au InsertLeave * set nocul
+" Very important to keep it off in command mode because it is a performance hog.
 " Change Color when entering Insert Mode
 " au InsertEnter * hi CursorLine guibg=#e0f0ff
 " Revert Color to default when leaving Insert Mode
@@ -64,7 +84,7 @@ autocmd VimLeave * silent !echo -ne "\033]112\007"
 " Layout
 "
 set noflash
-set modeline
+" set modeline
 set title
 set ruler
 set showcmd
@@ -73,10 +93,8 @@ set scrolloff=3
 set sidescrolloff=12
 set showtabline=2
 let g:lightline = {
-			\ 'component_function': {
-			\   'percent': 'noscrollbar#statusline'
-			\ },
 			\ 'component': {
+			\   'percent': "\{…\}%3{codeium#GetStatusString()}",
 			\   'readonly': '%{&readonly?"🚫":""}',
 			\ },
 			\ 'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
@@ -98,6 +116,7 @@ let g:lightline#bufferline#shorten_path = '1'
 
 " Other behavior
 "
+set backspace=indent,eol,start
 set nospell
 let loaded_matchparen=1
 set wildmenu
@@ -112,6 +131,8 @@ command DiffOrig vert new | set bt=nofile | r # | 0d_ | diffthis | wincmd p | di
 " Yank to system CLIPBOARD and PRIMARY
 set clipboard=unnamed,unnamedplus,exclude:cons\|linux
 let g:tagbar_sort = 0
+let g:gutentags_ctags_tagfile = ".tags"
+let g:gutentags_ctags_exclude = ['node_modules', 'vendor']
 
 
 " Searching
@@ -120,8 +141,12 @@ set hlsearch
 set incsearch
 set ignorecase
 set smartcase
-set showmatch  " buggy with '}}' per https://github.com/vim/vim/issues/437
+set noshowmatch  " buggy with '}}' per https://github.com/vim/vim/issues/437
 runtime macros/matchit.vim
+" Reset highlight: complement to '*' and search results
+" Made obsolete by plugin inkarkat/vim-SearchHighlighting which makes * a
+" toggle.
+" map <leader>8 :noh<cr>
 
 
 " Folding
@@ -142,15 +167,32 @@ set fillchars+=vert:│
 "set autochdir
 autocmd FileType netrw setl bufhidden=wipe
 
+" FZF
+" Adapted from https://github.com/junegunn/fzf/issues/2687
+function! MyFiles()
+	let path = trim(system('cd '.shellescape(expand('%:p:h')).' && git rev-parse --show-toplevel'))
+	if !isdirectory(path)
+		let path = expand('%:p:h')
+	endif
+	exe 'Files ' . path
+endfunction
+command! MyFiles call MyFiles()
+
+
+" Handy commands
+"
+command -range=% SortIP <line1>,<line2>!sort -n -t . -k 1,1 -k 2,2 -k 3,3 -k 4,4
 
 " My custom inputs
 "
 set mouse=nvi
 set ttymouse=sgr
-set timeoutlen=1000 ttimeoutlen=0
-" Escape without ESC
-inoremap jk <Esc>
-inoremap kj <Esc>
+" Since undo is 'u', let's make redo 'U'
+map U :redo<cr>
+" Split edits
+map <C-E> :split<cr>
+map <C-R> :wincmd p<cr>
+map <C-T> :hide<cr>
 " Basic tab/buffer navigation
 map <C-PageUp> :bprevious<cr>
 map <C-PageDown> :bnext<cr>
@@ -158,16 +200,15 @@ map [5;5~ :bprevious<cr>
 map [6;5~ :bnext<cr>
 map <C-W> :bd<cr>
 " File explorer
-map = :Explore<cr>
+map + :Explore<cr>
+map = :MyFiles<cr>
 " Tag explorer
 map - :TagbarOpenAutoClose<cr>
-" Reset highlight: complement to '*' and search results
-map <leader>8 :noh<cr>
 map  :%s/
 map!  /cg
 map  :%&cg
-map!  :s/./_\b&/gi
-map!  :s/./&\b&/gi
+" map!  :s/./_\b&/g\i
+" map!  :s/./&\b&/g\i
 " Numeric keypad (disabled after moving to a laptop)
 "map! Op 0
 "map! On .
@@ -197,18 +238,20 @@ set smarttab
 set tabstop=4
 set noexpandtab
 set shiftwidth=4
-set textwidth=132
+set textwidth=80
 syntax on
+set synmaxcol=120
 highlight ExtraWhitespace ctermbg=red guibg=red
 match ExtraWhitespace /\s\+$/
 set list
 set listchars=tab:│\ ,nbsp:⎵
 highlight SpecialKey ctermfg=lightgray guifg=lightgray
 " The indentLine plugin adds similar pipes for space identations, although invisible in the cursorline.
-let g:indentLine_char = '│'
-let g:indentLine_color_term = 250
-let g:indentLine_color_gui = "#cccccc"
-let g:indentLine_concealcursor = ''
+" Currently disabled in search of better responsiveness.
+" let g:indentLine_char = '│'
+" let g:indentLine_color_term = 250
+" let g:indentLine_color_gui = "#cccccc"
+" let g:indentLine_concealcursor = ''
 " Comment keyword highlights
 " Thanks to: https://vi.stackexchange.com/a/15531
 highlight clear Todo
@@ -227,18 +270,73 @@ highlight myHlUrgent ctermfg=black guifg=black ctermbg=red guibg=#ff8800
 highlight myHlImportant ctermfg=black guifg=black ctermbg=red guibg=#eecc00
 highlight myHlCool ctermfg=black guifg=black ctermbg=red guibg=#77dd77
 
-
 " Omni
 "
 :set completeopt=menuone,preview,longest
 " Auto-close omni preview window when we leave the menu
 au CursorMovedI,InsertLeave * if pumvisible() == 0|silent! pclose|endif
-let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
-let g:SuperTabLongestHighlight = 1
+
+" Codeium
+"
+" Override defaults to play nice with omnicompletion.
+"
+" Based on:
+" https://gist.github.com/limitedeternity/9349aae07dac6bea191aa97949633990
+function! HasCodeiumCompletion() abort
+	return exists('b:_codeium_completions') &&
+		\ has_key(b:_codeium_completions, 'items') &&
+		\ has_key(b:_codeium_completions, 'index') &&
+		\ len(b:_codeium_completions['items']) > 0
+endfunction
+function! SmartTab() abort
+	if HasCodeiumCompletion()
+		return codeium#Accept()
+	endif
+	if pumvisible()
+		return "\<C-Y>"
+	endif
+	if strpart(getline('.'), 0, col('.') - 1) =~ '^\s*$'
+		return "\<Tab>"
+	endif
+	if has("autocmd") && exists("+omnifunc")
+		return "\<C-X>\<C-O>"
+	endif
+	return "\<Tab>"
+endfunction
+function! SmartBackspace() abort
+	if HasCodeiumCompletion()
+		return codeium#Clear()
+	endif
+	return "\<BS>"
+endfunction
+function! SmartPageUp() abort
+	if HasCodeiumCompletion()
+		call codeium#CycleCompletions(-1)
+		return ""
+	endif
+	return "\<PageUp>"
+endfunction
+function! SmartPageDown() abort
+	if HasCodeiumCompletion()
+		call codeium#CycleCompletions(1)
+		return ""
+	endif
+	return "\<PageDown>"
+endfunction
+let g:codeium_disable_bindings = 1
+inoremap <silent><expr> <Tab> SmartTab()
+inoremap <silent><expr> <BS> SmartBackspace()
+inoremap <silent><expr> <PageUp> SmartPageUp()
+inoremap <silent><expr> <PageDown> SmartPageDown()
+" To disable by default and ask explicitly for suggestions:
+" let g:codeium_manual = v:true
+" imap <S-Tab> <Cmd>call codeium#Complete()<cr>
+" imap <F12> <Cmd>call codeium#Complete()<cr>
 
 " Language-specific
 "
 au Filetype ocaml setlocal tabstop=2 expandtab shiftwidth=2 textwidth=80 formatoptions-=r
+au Filetype proto setlocal tabstop=2 expandtab shiftwidth=2 textwidth=80
 let g:merlin_completion_with_doc = 1
 au Filetype markdown setlocal wrap formatoptions-=tcq
 let g:javascript_plugin_jsdoc = 1
@@ -253,6 +351,8 @@ source ~/src/graphx/.vimrc
 "
 filetype off
 let &runtimepath.='~/.vim/plugged/ale'
+" Virtualtext INJECTS TEXT! breaks parsing and adds nothing vs status area.
+let g:ale_virtualtext_cursor = 0
 let g:ale_sign_column_always = 1
 let g:ale_sign_error = '⛔'
 highlight ALEErrorSign ctermfg=white guifg=white ctermbg=10 guibg=#ebebeb
@@ -263,24 +363,29 @@ highlight SpellCap ctermbg=10 guibg=#e0f0ff
 let g:ale_fix_on_save = 1
 let g:ale_lint_on_text_changed = 'normal'
 "let g:ale_linters_explicit = 1
-"let g:ale_linters = {
-"			\'ocaml': ['ols'],
-"			\}
+ let g:ale_linters = {
+ 			\'javascript': ['eslint'],
+ 			\'perl': ['perl','perlcritic'],
+ 			\'python': ['flake8'],
+ 			\}
+"let g:ale_javascript_eslint_options = "--rule 'camelcase:off' --rule 'key-spacing:off' --rule 'quotes:off' --rule 'indent:[2,tab]' --rule 'max-statements:off'"
 let g:ale_fixers = {
-			\'javascript': ['prettier'],
+			\'c': ['clang-format'],
 			\'css': ['prettier'],
+			\'javascript': ['prettier_eslint'],
 			\'json': ['jq'],
 			\'ocaml': ['ocamlformat'],
-			\'reason': ['refmt'],
+			\'python': ['black'],
+			\'scss': ['prettier'],
 			\}
-"let g:ale_javascript_prettier_options = '--single-quote --trailing-comma es5'
-"let g:ale_javascript_prettier_options = '--tab-width=4 --use-tabs'
-let g:ale_javascript_prettier_options = '--single-quote'
-let g:ale_css_prettier_options = '--tab-width=4 --use-tabs'
-" TODO: JS, I get eslint warnings yet it says Prettier only above, wtf?
-" TODO: Reason ?
-" TODO: Perl, do we bother? Would perl-critic help catch bugs or juts formatting?
+" JS
+"let g:ale_javascript_prettier_eslint_options = "--use-tabs --tab-width=4 --single-quote --trailing-comma=es5"
+" CSS
+"let g:ale_javascript_prettier_options = '--use-tabs --tab-width=4 --trailing-comma=es5'
+" OCaml
+let g:ale_ocaml_ocamlformat_options = '--enable-outside-detected-project'
 filetype plugin on
+map <leader>w :ALENextWrap<cr>
 
 
 " Git
@@ -296,6 +401,7 @@ highlight GitGutterChangeDelete ctermfg=black guifg=black ctermbg=blue guibg=#87
 highlight GitGutterDelete ctermfg=white guifg=white ctermbg=red guibg=#df2f50
 map <leader>s :let @g = system("git blame -c -L " . line(".") . ",+1 " . expand("%"))<cr>:echomsg @g<cr>
 "map <leader>s :Gblame<cr>
+map <leader>g :GitGutterNextHunk<cr>
 
 " I wanted undercurls, but they are still not merged in Vim as of 2019-01-25
 "
@@ -340,3 +446,8 @@ for tool in s:opam_packages
   endif
 endfor
 " ## end of OPAM user-setup addition for vim / base ## keep this line
+" ## added by OPAM user-setup for vim / ocp-indent ## 069fbb917b55952c530d38de8a07fa52 ## you can edit, but keep this line
+if count(s:opam_available_tools,"ocp-indent") == 0
+  source "/home/lis/.opam/4.13.1+muslnative+flambda/share/ocp-indent/vim/indent/ocaml.vim"
+endif
+" ## end of OPAM user-setup addition for vim / ocp-indent ## keep this line
