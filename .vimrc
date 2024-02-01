@@ -234,16 +234,6 @@ set shiftwidth=4
 set textwidth=80
 syntax off
 set synmaxcol=120
-highlight ExtraWhitespace ctermbg=red guibg=red
-match ExtraWhitespace /\s\+$/
-set list
-set listchars=tab:│\ ,nbsp:⎵
-highlight SpecialKey ctermfg=lightgray guifg=lightgray
-" The indentLine plugin adds similar pipes for space identations, although invisible in the cursorline.
-let g:indentLine_char = '│'
-let g:indentLine_color_term = 250
-let g:indentLine_color_gui = "#cccccc"
-let g:indentLine_concealcursor = ''
 
 " Omni
 "
@@ -265,6 +255,12 @@ if stridx(getcwd(), expand('~/src/graphx')) == 0
 	source ~/src/graphx/.vimrc
 endif
 
+" Additional highlighting
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
+set list
+set listchars=tab:│\ ,nbsp:⎵
+highlight SpecialKey ctermfg=lightgray guifg=lightgray
 
 " ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
 let s:opam_share_dir = system("opam config var share")

@@ -18,9 +18,6 @@ Plug 'junegunn/fzf.vim'
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 
-" Show indentation even for spaces
-Plug 'Yggdroot/indentLine'   " Might slow things down?
-
 " Inkarkat plugins
 Plug 'inkarkat/vim-ingo-library'
 " Improve * command

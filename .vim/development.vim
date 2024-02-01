@@ -5,16 +5,6 @@ syntax on
 " Tag explorer
 map - :TagbarOpenAutoClose<cr>
 
-" Development-specific Lightline config
-let g:lightline = {
-			\ 'component': {
-			\   'percent': "\{…\}%3{codeium#GetStatusString()}",
-			\   'readonly': '%{&readonly?"🚫":""}',
-			\ },
-			\ 'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
-			\ 'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" }
-			\ }
-
 " Comment keyword highlights
 " Thanks to: https://vi.stackexchange.com/a/15531
 highlight clear Todo
@@ -89,6 +79,10 @@ inoremap <silent><expr> <PageDown> SmartPageDown()
 " let g:codeium_manual = v:true
 " imap <S-Tab> <Cmd>call codeium#Complete()<cr>
 " imap <F12> <Cmd>call codeium#Complete()<cr>
+"
+" Lightline status
+let g:lightline.component.percent = "\{…\}%3{codeium#GetStatusString()}"
+
 
 " Language-specific
 "

@@ -15,18 +15,3 @@ if [ -n "$BASH_VERSION" ]; then
 	. "$HOME/.bashrc"
     fi
 fi
-
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-export PERL5LIB=$HOME/bin/lib
-
-# Personal addition for user-level global NodeJS stuff
-if [ -d "$HOME/.node_modules_global/bin" ]; then
-	export PATH="$HOME/.node_modules_global/bin:$PATH"
-fi
-
-# opam configuration
-test -r /home/lis/.opam/opam-init/init.sh && . /home/lis/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
